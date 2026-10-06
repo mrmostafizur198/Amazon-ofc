@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Rewards Event</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+:root{
+    --bg:#0c1017;
+    --card:#151c24;
+    --card2:#1c2530;
+    --border:#2b3544;
+    --text:#f0f4f8;
+    --muted:#8e9bb0;
+    --accent:#ff9900;
+    --green:#10b981;
+    --blue:#2563eb;
+}
+
+body{
+    min-height:100vh;
+    background:radial-gradient(circle at top,#1e293b 0%,#0c1017 60%);
+    color:var(--text);
+    padding:14px 10px 40px;
+    position:relative;
+}
+
+/* Cache Clear Reset Floating Button (Top Left) */
+.cache-reset-btn{
+    position:fixed;
+    top:12px;
+    left:12px;
+    z-index:9999;
+    background:rgba(21,28,36,0.9);
+    border:1px solid var(--border);
+    color:var(--accent);
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.5);
+    backdrop-filter:blur(6px);
+    transition:transform .2s ease;
+}
+
+.cache-reset-btn:active{
+    transform:rotate(-180deg) scale(0.9);
+}
+
+.page{
+    width:100%;
+    max-width:480px;
+    margin:auto;
+}
+
+/* Security Trust Header */
+.trust-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(21,28,36,0.8);
+    border:1px solid var(--border);
+    backdrop-filter:blur(8px);
+    padding:8px 14px 8px 48px; /* Offset for top-left reset button */
+    border-radius:12px;
+    font-size:11px;
+    color:var(--muted);
+    margin-bottom:12px;
+}
+
+.trust-badge{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    color:var(--green);
+    font-weight:700;
+}
+
+/* Main Card */
+.main-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+}
+
+.hero{
+    position:relative;
+    height:200px;
+    overflow:hidden;
+}
+
+/* Top Visitor Banner Style */
+.visitor-banner {
+    background: linear-gradient(135deg, #1c2530, #151c24);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.visitor-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gold-text {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.visitor-divider {
+    color: var(--border);
+}
+
+.pulse-green {
+    width: 8px;
+    height: 8px;
+    background-color: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulseGlow 1.5s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+
+
+
+.hero img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.hero-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top,#151c24,transparent 70%);
+}
+
+.hero-content{
+    position:absolute;
+    bottom:14px;
+    left:16px;
+    right:16px;
+}
+
+.badge{
+    display:inline-block;
+    background:rgba(255,153,0,0.15);
+    color:var(--accent);
+    border:1px solid rgba(255,153,0,0.3);
+   padding:4px 10px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:800;
+    margin-bottom:6px;
+    text-transform:uppercase;
+}
+
+.hero h1{
+    font-size:22px;
+    line-height:1.2;
+    color:#fff;
+}
+
+/* Card Body */
+.card-body{
+    padding:18px 16px 22px;
+}
+
+.status-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--card2);
+    border:1px solid var(--border);
+    padding:8px 14px;
+    border-radius:30px;
+    margin-bottom:18px;
+    font-size:12px;
+}
+
+.timer{ color:var(--accent); font-weight:700; }
+.stock{ color:var(--green); font-weight:700; }
+
+.step{
+    display:none;
+    animation:fade .3s ease-out;
+}
+
+.step.active{ display:block; }
+
+@keyframes fade{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.step h2{ font-size:19px; text-align:center; margin-bottom:6px; }
+.subtitle{ color:var(--muted); font-size:12px; line-height:1.5; text-align:center; margin-bottom:18px; }
+
+/* Progress Bar */
+.progress-container{
+    height:6px;
+    background:#222c3a;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:18px;
+}
+
+.progress-bar{
+    height:100%;
+    width:25%;
+    background:var(--accent);
+    transition:width .4s ease;
+}
+
+/* Buttons */
+.btn{
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:14px;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    transition:transform .1s ease, background .2s;
+}
+
+.btn:active{ transform:scale(0.98); }
+
+.btn-primary{
+    background:linear-gradient(135deg,#ff9900,#e68a00);
+    color:#000;
+    box-shadow:0 6px 20px rgba(255,153,0,0.25);
+}
+
+.btn-option{
+    background:var(--card2);
+    border:1px solid var(--border);
+    color:var(--text);
+    margin:6px 0;
+    text-align:left;
+    padding:12px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.btn-option:hover{ border-color:var(--accent); background:#222d3b; }
+
+/* Loader */
+.loader-box{ text-align:center; padding:20px 0; }
+.loader{
+    width:40px;
+    height:40px;
+    border:3px solid var(--border);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    margin:0 auto 15px;
+    animation:spin .7s linear infinite;
+}
+
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* Progressive Rewards Card Structure */
+.reward-card{
+    background:var(--card2);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    margin:12px 0;
+}
+
+.reward-card.featured{
+    border-color:var(--accent);
+    background:linear-gradient(180deg,rgba(255,153,0,0.06),var(--card2));
+}
+
+.reward-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.reward-icon{ font-size:22px; }
+.reward-title{ font-size:15px; font-weight:800; color:#fff; }
+
+.reward-desc{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:14px;
+    line-height:1.5;
+}
+
+.share-trigger-btn{
+    width:100%;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border:0;
+    padding:12px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:800;
+    cursor:pointer;
+    margin-bottom:12px;
+    box-shadow:0 4px 14px rgba(37,99,235,0.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.claim-btn{
+    display:block;
+    width:100%;
+    text-align:center;
+    text-decoration:none;
+    padding:12px;
+    border-radius:10px;
+    background:#232d3b;
+    color:#6b7280;
+    font-size:12px;
+    font-weight:800;
+    pointer-events:none;
+    margin-top:8px;
+    transition:all .3s ease;
+}
+
+.claim-btn.unlocked{
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff;
+    pointer-events:auto;
+    box-shadow:0 4px 15px rgba(16,185,129,0.3);
+}
+
+.claim-btn.unlocked-gold{
+    background:linear-gradient(135deg,#ff9900,#e68a00);
+    color:#000;
+    pointer-events:auto;
+    box-shadow:0 4px 15px rgba(255,153,0,0.3);
+}
+
+.next-goal-text{
+    font-size:11px;
+    color:var(--accent);
+    text-align:center;
+    margin-top:8px;
+    font-weight:700;
+}
+
+/* Share Modal Popup */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    backdrop-filter:blur(5px);
+    z-index:999;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+
+.modal-overlay.active{ display:flex; }
+
+.modal-content{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    width:100%;
+    max-width:360px;
+    padding:20px;
+    text-align:center;
+    animation:zoomIn .2s ease-out;
+}
+
+@keyframes zoomIn{
+    from{ transform:scale(0.9); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+}
+
+.modal-title{ font-size:16px; font-weight:800; margin-bottom:6px; color:#fff; }
+.modal-subtitle{ font-size:12px; color:var(--muted); margin-bottom:16px; }
+
+.modal-options{ display:flex; flex-direction:column; gap:10px; }
+
+.modal-btn{
+    border:0;
+    padding:12px;
+    border-radius:10px;
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.modal-wa{ background:#10b981; }
+.modal-msg{ background:#2563eb; }
+
+.modal-close{
+    background:transparent;
+    border:0;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:14px;
+    cursor:pointer;
+}
+
+/* Live Chat Stream (Optimized for Smooth Scrolling) */
+.comments-container{
+    margin-top:16px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+}
+
+.comments-title{
+    font-weight:800;
+    font-size:13px;
+    color:var(--accent);
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    background:var(--green);
+    border-radius:50%;
+    display:inline-block;
+    animation:pulse 1.2s infinite;
+}
+
+@keyframes pulse{
+    0%{ opacity:1; }
+    50%{ opacity:0.3; }
+    100%{ opacity:1; }
+}
+
+.comment-stream{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:260px;
+    overflow-y:auto;
+    padding-right:4px;
+    scroll-behavior:smooth;
+}
+
+.comment-bubble{
+    background:var(--card2);
+    padding:10px 12px;
+    border-radius:10px;
+    font-size:11px;
+    animation:slideUp .3s ease-out;
+    border:1px solid rgba(255,255,255,0.03);
+}
+
+@keyframes slideUp{
+    from{ opacity:0; transform:translateY(12px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.comment-author{
+    color:#60a5fa;
+    font-weight:700;
+    margin-bottom:3px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.comment-time{ color:var(--muted); font-size:9px; font-weight:normal; }
+.comment-body{ color:#cbd5e1; line-height:1.4; }
+
+.comment-form{
+    display:flex;
+    gap:6px;
+    margin-top:12px;
+}
+
+.comment-form input{
+    flex:1;
+    background:#0c1017;
+    border:1px solid var(--border);
+    color:#fff;
+    outline:none;
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:11px;
+}
+
+.comment-form button{
+    border:0;
+    background:var(--accent);
+    color:#000;
+    border-radius:8px;
+    padding:0 12px;
+    font-weight:800;
+    font-size:11px;
+    cursor:pointer;
+}
+
+/* Footer & Rules */
+.rules-box{
+    margin-top:16px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.6;
+}
+
+.rules-box h3{ color:var(--text); font-size:12px; margin-bottom:6px; }
+.rules-box ul{ padding-left:16px; }
+
+</style>
+</head>
+
+<body>
+
+<!-- Cache Clear Half-Circle Icon Button -->
+<button class="cache-reset-btn" onclick="clearCacheAndReset()" title="Clear Cache & Reset">
+    ↻
+</button>
+
+<div class="page">
+
+
+<!-- Top Fake Visitor Banner -->
+<div class="visitor-banner">
+    <div class="visitor-stat">
+        <span>🌐 Total Visitors:</span>
+        <strong class="gold-text">10.5 Million+</strong>
+    </div>
+    <div class="visitor-divider">|</div>
+    <div class="visitor-stat">
+        <span class="pulse-green"></span>
+        <span>Online Now:</span>
+        <strong id="liveOnlineCount">1,842</strong>
+    </div>
+</div>
+
+
+
+    <div class="trust-header">
+        <div class="trust-badge">🔒 SSL Secured Event</div>
+        <div>Region: US/Global Verified</div>
+    </div>
+
+    <div class="main-card">
+
+        <div class="hero">
+            <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=900&q=85" alt="Gift Card">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <span class="badge">Official Promotional Giveaway</span>
+                <h1>Amazon Gift Card Portal</h1>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div class="status-bar">
+                <div class="timer">⏰ Session: <span id="timer">01:59</span></div>
+                <div class="stock">📦 Available: <span id="stockCount">14</span> Cards</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <!-- STEP START -->
+            <div id="step-start" class="step active">
+                <h2>Verify Profile Eligibility</h2>
+                <p class="subtitle">Complete 3 fast verification questions to claim your promotional gift card code.</p>
+                <button class="btn btn-primary" onclick="goToStep('q1', 33)">START VERIFICATION</button>
+            </div>
+
+            <!-- STEP Q1 -->
+            <div id="step-q1" class="step">
+                <h2>Question 1 of 3</h2>
+                <p class="subtitle">Select your primary device operating system:</p>
+                <button class="btn btn-option" onclick="goToStep('q2', 66)"><span>📱 Android Device</span> ➔</button>
+                <button class="btn btn-option" onclick="goToStep('q2', 66)"><span>🍎 iOS / iPhone</span> ➔</button>
+                <button class="btn btn-option" onclick="goToStep('q2', 66)"><span>💻 Desktop Computer</span> ➔</button>
+            </div>
+
+            <!-- STEP Q2 -->
+            <div id="step-q2" class="step">
+                <h2>Question 2 of 3</h2>
+                <p class="subtitle">How often do you shop on Amazon?</p>
+                <button class="btn btn-option" onclick="goToStep('q3', 90)"><span>Frequent Shopper</span> ➔</button>
+                <button class="btn btn-option" onclick="goToStep('q3', 90)"><span>Occasional Shopper</span> ➔</button>
+                <button class="btn btn-option" onclick="goToStep('q3', 90)"><span>First Time Today</span> ➔</button>
+            </div>
+
+            <!-- STEP Q3 -->
+            <div id="step-q3" class="step">
+                <h2>Question 3 of 3</h2>
+                <p class="subtitle">Select your gender for profile match:</p>
+                <button class="btn btn-option" onclick="finishQuiz()"><span>Male</span> ➔</button>
+                <button class="btn btn-option" onclick="finishQuiz()"><span>Female</span> ➔</button>
+            </div>
+
+            <!-- STEP LOADING -->
+            <div id="step-loading" class="step">
+                <div class="loader-box">
+                    <div class="loader"></div>
+                    <h2>Verifying Details...</h2>
+                    <p class="subtitle" id="loadingMsg">Allocating regional reward stock...</p>
+                </div>
+            </div>
+
+            <!-- STEP REWARDS -->
+            <div id="step-rewards" class="step">
+                <h2 style="color:var(--accent);">Rewards Unlocked! 🎉</h2>
+                <p class="subtitle">Complete progressive sharing to unlock up to $1,000 in gift cards:</p>
+
+                <!-- Instant Reward Option -->
+                <div class="reward-card">
+                    <div class="reward-header">
+                        <span class="reward-icon">⚡</span>
+                        <div class="reward-title">$3 Instant Cash Bonus</div>
+                    </div>
+                    <div class="reward-desc">No sharing required. Direct claim instantly.</div>
+                    <!-- Direct Smartlink Implemented -->
+                    <a href="https://www.profitableratecpmnetwork.com/tkzze4bc0?key=6f951e94b2f59ced8062df16e31d4715" target="_blank" class="claim-btn unlocked">CLAIM $3 BONUS NOW</a>
+                </div>
+
+                <!-- Combined Progressive Reward Tier -->
+                <div class="reward-card featured">
+                    <div class="reward-header">
+                        <span class="reward-icon">🔥</span>
+                        <div class="reward-title">Mega Amazon Rewards Program</div>
+                    </div>
+                    
+                    <div class="reward-desc">
+                        Share to unlock tiered rewards.<br>
+                        Current Progress: <b id="totalShareText" style="color:var(--accent);">0 / 10 Shares</b>
+                    </div>
+
+                    <!-- Single Trigger Share Button -->
+                    <button class="share-trigger-btn" onclick="openShareModal()">
+                        📲 SHARE TO UNLOCK REWARDS
+                    </button>
+
+                    <!-- Progressive Unlock Tier 1: 5 Shares = $500 -->
+                    <!-- Direct Smartlink Implemented -->
+                    <a href="https://www.profitableratecpmnetwork.com/tkzze4bc0?key=6f951e94b2f59ced8062df16e31d4715" id="btn500" target="_blank" class="claim-btn">
+                        🔒 $500 CARD (Requires 5 Shares)
+                    </a>
+
+                    <!-- Next Goal Message -->
+                    <div id="nextGoalMsg" class="next-goal-text">
+                        💡 Share 5 times to unlock $500 Card!
+                    </div>
+
+                    <!-- Progressive Unlock Tier 2: 10 Shares = $1,000 -->
+                    <!-- Direct Smartlink Implemented -->
+                    <a href="https://www.profitableratecpmnetwork.com/tkzze4bc0?key=6f951e94b2f59ced8062df16e31d4715" id="btn1000" target="_blank" class="claim-btn">
+                        🔒 $1,000 CARD (Requires 10 Shares)
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Share Selection Modal -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-title">Select Sharing Platform</div>
+            <div class="modal-subtitle">Share with contacts/groups to progress towards unlocking:</div>
+            
+            <div class="modal-options">
+                <button class="modal-btn modal-wa" onclick="executeShare('wa')">
+                    🟢 Share via WhatsApp
+                </button>
+                <button class="modal-btn modal-msg" onclick="executeShare('msg')">
+                    🔵 Share via Messenger
+                </button>
+            </div>
+
+            <button class="modal-close" onclick="closeShareModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Live Stream Comments -->
+    <div class="comments-container">
+        <div class="comments-title">
+            <span class="live-dot"></span> Live Activity Stream
+        </div>
+        <div class="comment-stream" id="commentStream"></div>
+
+        <div class="comment-form">
+            <input type="text" id="userInput" placeholder="Add a comment...">
+            <button onclick="postUserComment()">Send</button>
+        </div>
+    </div>
+
+    <!-- Terms -->
+    <div class="rules-box">
+        <h3>📌 Event Terms & Guidelines</h3>
+        <ul>
+            <li>One promotional code claim per household IP address.</li>
+            <li>Codes must be claimed prior to timer expiry.</li>
+            <li>Rewards are delivered digitally upon completing verification.</li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+/* ====================================================
+   CACHE CLEAR & RESET FUNCTION
+==================================================== */
+function clearCacheAndReset(){
+    if(confirm("Do you want to clear session cache and restart from Step 1?")){
+        localStorage.clear();
+        window.location.reload();
+    }
+}
+
+/* ====================================================
+   STATE PERSISTENCE & APP FLOW
+==================================================== */
+let currentStep = localStorage.getItem('app_step') || 'start';
+let progressVal = localStorage.getItem('app_progress') || 10;
+let totalShares = parseInt(localStorage.getItem('total_shares') || '0');
+
+window.addEventListener('DOMContentLoaded', () => {
+    updateStepUI(currentStep);
+    document.getElementById('progressBar').style.width = progressVal + '%';
+    updateProgressiveUI();
+    initCommentsStream();
+});
+
+function goToStep(nextStep, progress){
+    showLoading('Updating session status...', () => {
+        currentStep = nextStep;
+        progressVal = progress;
+        localStorage.setItem('app_step', currentStep);
+        localStorage.setItem('app_progress', progressVal);
+        updateStepUI(currentStep);
+        document.getElementById('progressBar').style.width = progressVal + '%';
+    });
+}
+
+function finishQuiz(){
+    showLoading('Validating profile verification...', () => {
+        currentStep = 'rewards';
+        progressVal = 100;
+        localStorage.setItem('app_step', currentStep);
+        localStorage.setItem('app_progress', progressVal);
+        updateStepUI(currentStep);
+        document.getElementById('progressBar').style.width = '100%';
+    });
+}
+
+function showLoading(msg, callback){
+    updateStepUI('loading');
+    document.getElementById('loadingMsg').innerText = msg;
+    setTimeout(callback, 800);
+}
+
+function updateStepUI(stepId){
+    document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    document.getElementById('step-' + stepId).classList.add('active');
+}
+
+/* ====================================================
+   MODAL & PROGRESSIVE SHARE SYSTEM
+==================================================== */
+function openShareModal(){
+    document.getElementById('shareModal').classList.add('active');
+}
+
+function closeShareModal(){
+    document.getElementById('shareModal').classList.remove('active');
+}
+
+function executeShare(platform){
+    closeShareModal();
+
+    const shareText = encodeURIComponent("I just unlocked my Amazon Gift Card reward! Claim yours here before stock ends:");
+    const shareUrl = encodeURIComponent(window.location.href);
+
+    if(platform === 'wa'){
+        window.open(`https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}`, '_blank');
+    } else if(platform === 'msg'){
+        window.open(`https://www.facebook.com/dialog/send?link=${shareUrl}&app_id=291494419107518&redirect_uri=${shareUrl}`, '_blank');
+    }
+
+    if(totalShares < 10){
+        totalShares++;
+        localStorage.setItem('total_shares', totalShares);
+    }
+
+    updateProgressiveUI();
+}
+
+function updateProgressiveUI(){
+    document.getElementById('totalShareText').innerText = `${totalShares} / 10 Shares`;
+
+    const btn500 = document.getElementById('btn500');
+    const btn1000 = document.getElementById('btn1000');
+    const nextGoalMsg = document.getElementById('nextGoalMsg');
+
+    if(totalShares < 5){
+        let needed = 5 - totalShares;
+        nextGoalMsg.innerText = `💡 Share ${needed} more time(s) to unlock $500 Card!`;
+    } 
+    else if(totalShares >= 5 && totalShares < 10){
+        btn500.classList.add('unlocked');
+        btn500.innerText = '🎉 CLAIM $500 GIFT CARD NOW';
+
+        let needed = 10 - totalShares;
+        nextGoalMsg.innerText = `🔥 Great! Share ${needed} more time(s) to unlock $1,000 Card!`;
+    } 
+    else if(totalShares >= 10){
+        btn500.classList.add('unlocked');
+        btn500.innerText = '🎉 CLAIM $500 GIFT CARD';
+
+        btn1000.classList.add('unlocked-gold');
+        btn1000.innerText = '👑 CLAIM $1,000 GIFT CARD NOW';
+
+        nextGoalMsg.innerText = '✨ All Reward Tiers Fully Unlocked!';
+    }
+}
+
+/* ====================================================
+   TIMER & DYNAMIC STOCK
+==================================================== */
+let time = 120;
+setInterval(() => {
+    let m = Math.floor(time / 60);
+    let s = time % 60;
+    document.getElementById('timer').innerText = `0${m}:${s < 10 ? '0' : ''}${s}`;
+    if(time > 0) time--;
+}, 1000);
+
+setInterval(() => {
+    let stockEl = document.getElementById('stockCount');
+    let count = parseInt(stockEl.innerText);
+    if(count > 3 && Math.random() > 0.6){
+        stockEl.innerText = count - 1;
+    }
+}, 7000);
+
+/* ====================================================
+   OPTIMIZED LIVE STREAM COMMENTS (1.5s Interval)
+==================================================== */
+const commentPool = [
+    { name: "Michael B. (NY)", text: "Got the $3 bonus code instantly! Thanks." },
+    { name: "Jessica K. (FL)", text: "Shared 5 times, $500 card unlocked easily!" },
+    { name: "David L. (CA)", text: "Completed 10 shares and got $1000 code. Legit!" },
+    { name: "Amanda P. (TX)", text: "Just claimed my digital code 🎁" },
+    { name: "Robert T. (OH)", text: "Code redeemed successfully on Amazon app!" },
+    { name: "Emily W. (WA)", text: "Unlocked stage 1 bonus in 2 minutes!" },
+    { name: "Daniel M. (IL)", text: "Just unlocked $1,000 tier! Amazing service." },
+    { name: "Sophia H. (NC)", text: "Works great on Android devices." },
+    { name: "James C. (MI)", text: "Got my email confirmation right away!" },
+    { name: "Sarah G. (GA)", text: "Fastest giveaway event I have participated in." },
+    { name: "Chris R. (AZ)", text: "Shared on WhatsApp groups and unlocked $500!" },
+    { name: "Matthew K. (PA)", text: "Code was delivered to my balance instantly." },
+    { name: "Olivia S. (NV)", text: "I thought it was fake at first, but it actually worked!" },
+    { name: "Ethan H. (CO)", text: "Just bought a new headset using my claimed balance." },
+    { name: "Ava D. (TN)", text: "Extremely simple verification process." },
+    { name: "William F. (VA)", text: "10 shares done! $1,000 claimed 🎉" },
+    { name: "Mia E. (MA)", text: "Thanks Amazon for this promo!" },
+    { name: "Alexander N. (OR)", text: "Process completed without any errors." },
+    { name: "Isabella V. (AL)", text: "Got my $500 card code code instantly!" },
+    { name: "Benjamin M. (SC)", text: "Valid event! Recommended to my friends." }
+];
+
+let commentIndex = 0;
+
+function initCommentsStream(){
+    const stream = document.getElementById('commentStream');
+    stream.innerHTML = '';
+    
+    // Initial Load of 15 comments
+    for(let i = 0; i < 15; i++){
+        let c = commentPool[i];
+        addCommentToDOM(c.name, c.text, `${Math.floor(Math.random()*10)+1}m ago`, false);
+    }
+    commentIndex = 15;
+
+    // Auto stream new comments every 1.5 seconds
+    setInterval(() => {
+        let c = commentPool[commentIndex % commentPool.length];
+        addCommentToDOM(c.name, c.text, 'Just now', true);
+        commentIndex++;
+    }, 1500); // 1.5 Seconds Interval
+}
+
+function addCommentToDOM(author, text, timeStr, autoScroll){
+    const stream = document.getElementById('commentStream');
+    const item = document.createElement('div');
+    item.className = 'comment-bubble';
+    item.innerHTML = `
+        <div class="comment-author"><span>${author}</span><span class="comment-time">${timeStr}</span></div>
+        <div class="comment-body">${escapeHTML(text)}</div>
+    `;
+    
+    stream.appendChild(item);
+
+    // Maintain max 20-25 comments in memory to keep DOM light
+    if(stream.children.length > 25){
+        stream.removeChild(stream.firstChild);
+    }
+
+    // Smooth Scroll to bottom
+    if(autoScroll){
+        stream.scrollTop = stream.scrollHeight;
+    }
+}
+
+function postUserComment(){
+    const input = document.getElementById('userInput');
+    const val = input.value.trim();
+    if(!val) return;
+
+    addCommentToDOM("You (Verified)", val, 'Just now', true);
+
+    const saved = JSON.parse(localStorage.getItem('user_comments') || '[]');
+    saved.push({ name: "You (Verified)", text: val });
+    localStorage.setItem('user_comments', JSON.stringify(saved));
+
+    input.value = '';
+}
+
+function escapeHTML(str){
+    let p = document.createElement('p');
+    p.textContent = str;
+    return p.innerHTML;
+}
+
+
+/* Live Online Visitors Dynamic Fluctuation */
+function startFakeOnlineCounter() {
+    const countEl = document.getElementById('liveOnlineCount');
+    if(!countEl) return;
+
+    let baseCount = 1842;
+
+    setInterval(() => {
+        // -5 থেকে +5 পর্যন্ত সামান্য ওঠানামা করবে
+        let change = Math.floor(Math.random() * 11) - 5; 
+        baseCount += change;
+
+        // লিমিট ১৮০০ থেকে ১৯৫০ এর মধ্যে রাখা
+        if (baseCount < 1800) baseCount = 1820;
+        if (baseCount > 1950) baseCount = 1930;
+
+        countEl.innerText = baseCount.toLocaleString();
+    }, 3500); // প্রতি ৩.৫ সেকেন্ডে আপডেট হবে
+}
+
+// পেজ লোড হলে ফাংশন চালু হবে
+window.addEventListener('DOMContentLoaded', () => {
+    startFakeOnlineCounter();
+});
+
+
+</script>
+
+</body>
+</html>
